@@ -219,7 +219,7 @@ The practice maze, built from cardboard, with an earlier perfboard version of th
 
 Built at INSAT by:
 
-- Ahmed Ben Salah, firmware and most of the mechanical design
+- Ahmed Ben Salah, lead on most of the hardware and software
 - Mohamed Amine Ayari
 - Mohamed Aziz Chaibi
 - Mohamed Ayoub Ayari
