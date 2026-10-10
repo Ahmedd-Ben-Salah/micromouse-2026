@@ -516,7 +516,7 @@ void clearCellWalls(int x, int y) {
 }
 
 void readWallsHere() {
-  refreshSensors(250);
+  refreshSensors(250, 3);
   if (sensF.usable()) markWall(posX, posY, dir,        sensF.wall);
   if (sensL.usable()) markWall(posX, posY, leftDir(),  sensL.wall);
   if (sensR.usable()) markWall(posX, posY, rightDir(), sensR.wall);
@@ -696,7 +696,7 @@ bool turnInPlace(float degrees) {
       if (settled == 0) {
         settled = millis();
 
-        int b = 55 * turnSign();
+        int b = 55 * turnSign() * (degrees >= 0 ? 1 : -1);
         rightPWM(-b); leftPWM(b);
         delay(35);
         motorsOff();

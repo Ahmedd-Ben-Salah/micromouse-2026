@@ -2,7 +2,7 @@
 
 An autonomous maze solving robot built for the IEEE Micromouse challenge at National Robotics Week 8.0, INSAT Tunisia, September 2026. It placed 3rd.
 
-This repository is an archive of the robot as it competed: the firmware that ran on the day, how it works, and what went wrong on the way there.
+This repository is an archive of the robot as it competed: the firmware that ran on the day plus two small fixes made afterwards, how it works, and what went wrong on the way there.
 
 ![The robot](docs/images/robot.jpg)
 
@@ -140,9 +140,9 @@ These are the problems that actually cost time, roughly in the order they appear
 
 **Lateral estimate frozen at -10.** The diagnostics screen never called the update function, so it kept showing whatever value was left over from the last move. Every live screen now recomputes what it shows on every refresh.
 
-**Turn brake pulse in the wrong direction.** At the end of a turn a short reverse pulse kills the robot's momentum. It was hardcoded for a left turn, so on right turns it accelerated the robot into the turn instead. The competition build still has this bug, see the known limitations below.
+**Turn brake pulse in the wrong direction.** At the end of a turn a short reverse pulse kills the robot's momentum. It was hardcoded for a left turn, so on right turns it accelerated the robot into the turn instead. The pulse now takes its sign from the direction of the turn.
 
-**Missed walls.** Simulating the sensor filter showed that a newly appearing wall needs three filtered samples to cross the detection threshold, but the sensor refresh before reading walls only waited for two. The competition build still defaults to two, see the known limitations below.
+**Missed walls.** Simulating the sensor filter showed that a newly appearing wall needs three filtered samples to cross the detection threshold, but the sensor refresh before reading walls only waited for two. Wall reads now wait for three fresh readings from each sensor.
 
 **Reversing after a blocked move.** When a front wall stopped a move, the robot backed up the whole distance it had travelled to return to the start of the cell. But a front wall stop always leaves the robot exactly `FRONT_CENTRE_MM` from that wall, which is the cell centre already. The reversing was pointless shuffling and is gone. The robot now only backs up after a stop with some other cause, and only if it moved more than 30 mm.
 
@@ -150,13 +150,9 @@ These are the problems that actually cost time, roughly in the order they appear
 
 A verification pass after the return trip, which goes back to check boundaries the speed run would rely on, raised the share of optimal speed run paths in simulation from 71 to 100 percent. It costs about 48 extra cells of exploration to save under half a second on the run. That is 48 more chances to hit a wall and pay a 30 second retrieval. While reliability was the limiting factor it was the wrong trade, so it was left out.
 
-## Known limitations
+## Known limitation
 
 The speed run uses the same cell by cell loop as exploration. It stops, brakes and settles in every cell instead of driving along the planned path, so a higher speed setting buys much less time than it should. See [docs/speed-run-path-follower.md](docs/speed-run-path-follower.md) for the design of the fix, which was started but never finished.
-
-The brake pulse at the end of `turnInPlace` is still applied in a fixed direction, `rightPWM(-b); leftPWM(b)` with `b = 55 * turnSign()`. It brakes a left turn and pushes a right turn further. The fix is to take the pulse's sign from the sign of the turn.
-
-`readWallsHere` calls `refreshSensors(250)`, which waits for two fresh readings per sensor by default. A newly appearing wall needs three, so the call should pass `cycles = 3`.
 
 ## Building and flashing
 
@@ -221,7 +217,13 @@ The practice maze, built from cardboard, with an earlier perfboard version of th
 
 3rd place, IEEE Micromouse, National Robotics Week 8.0, INSAT, September 2026.
 
-Built by a team of three students at INSAT. I wrote the firmware and did most of the mechanical design.
+Built at INSAT by:
+
+- Ahmed Ben Salah, firmware and most of the mechanical design
+- Mohamed Amine Ayari
+- Mohamed Aziz Chaibi
+- Mohamed Ayoub Ayari
+- Ons Najjar
 
 ## License
 
